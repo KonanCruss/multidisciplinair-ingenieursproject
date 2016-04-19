@@ -13,7 +13,8 @@ namespace MultidisciplinairProject {
     public partial class MultidisciplinairProject : Form {
         Arduino arduino;
         Timer t;
-
+        
+        // Test
         public MultidisciplinairProject() {
             t = new Timer();
 
