@@ -17,11 +17,12 @@
             {
                 components.Dispose();
             }
-            if(disposing && arduino.IsOpen) {
+            if(arduino != null) {
                 arduino.ClosePort();
                 arduino = null;
             }
-            if(disposing && t.Enabled) {
+            if(t != null) {
+                t.Dispose();
                 t = null;
             }
             base.Dispose(disposing);
@@ -39,14 +40,27 @@
             this.Stop = new System.Windows.Forms.Button();
             this.autoStop = new System.Windows.Forms.CheckBox();
             this.label1 = new System.Windows.Forms.Label();
-            this.textBox1 = new System.Windows.Forms.TextBox();
             this.mainChart = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
+            this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.newToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.exportChartToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.exportValueTableToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.SamplingRate = new System.Windows.Forms.ToolStripTextBox();
+            this.Port = new System.Windows.Forms.ToolStripTextBox();
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.actionComboBox = new System.Windows.Forms.ToolStripComboBox();
             ((System.ComponentModel.ISupportInitialize)(this.mainChart)).BeginInit();
+            this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // Start
             // 
-            this.Start.Location = new System.Drawing.Point(12, 12);
+            this.Start.Location = new System.Drawing.Point(12, 27);
             this.Start.Name = "Start";
             this.Start.Size = new System.Drawing.Size(75, 23);
             this.Start.TabIndex = 0;
@@ -56,7 +70,7 @@
             // 
             // Stop
             // 
-            this.Stop.Location = new System.Drawing.Point(93, 12);
+            this.Stop.Location = new System.Drawing.Point(93, 27);
             this.Stop.Name = "Stop";
             this.Stop.Size = new System.Drawing.Size(75, 23);
             this.Stop.TabIndex = 1;
@@ -67,7 +81,7 @@
             // autoStop
             // 
             this.autoStop.AutoSize = true;
-            this.autoStop.Location = new System.Drawing.Point(174, 16);
+            this.autoStop.Location = new System.Drawing.Point(174, 31);
             this.autoStop.Name = "autoStop";
             this.autoStop.Size = new System.Drawing.Size(98, 17);
             this.autoStop.TabIndex = 2;
@@ -78,46 +92,145 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(297, 17);
+            this.label1.Location = new System.Drawing.Point(297, 32);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(70, 13);
             this.label1.TabIndex = 3;
             this.label1.Text = "00:00:00.000";
             // 
-            // textBox1
-            // 
-            this.textBox1.Location = new System.Drawing.Point(420, 14);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(100, 20);
-            this.textBox1.TabIndex = 4;
-            this.textBox1.Text = "Sampling rate in ms";
-            this.textBox1.Validating += new System.ComponentModel.CancelEventHandler(this.textBox1_Validating);
-            // 
             // mainChart
             // 
             this.mainChart.ImeMode = System.Windows.Forms.ImeMode.On;
-            this.mainChart.Location = new System.Drawing.Point(12, 41);
+            this.mainChart.Location = new System.Drawing.Point(12, 56);
             this.mainChart.Name = "mainChart";
-            this.mainChart.Size = new System.Drawing.Size(711, 564);
+            this.mainChart.Size = new System.Drawing.Size(716, 496);
             this.mainChart.TabIndex = 5;
             this.mainChart.Text = "mainChart";
+            // 
+            // menuStrip1
+            // 
+            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.fileToolStripMenuItem,
+            this.editToolStripMenuItem});
+            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
+            this.menuStrip1.Name = "menuStrip1";
+            this.menuStrip1.Size = new System.Drawing.Size(740, 24);
+            this.menuStrip1.TabIndex = 6;
+            this.menuStrip1.Text = "menuStrip1";
+            // 
+            // fileToolStripMenuItem
+            // 
+            this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.newToolStripMenuItem,
+            this.toolStripSeparator1,
+            this.exportChartToolStripMenuItem,
+            this.exportValueTableToolStripMenuItem,
+            this.toolStripSeparator2,
+            this.exitToolStripMenuItem});
+            this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
+            this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
+            this.fileToolStripMenuItem.Text = "File";
+            // 
+            // newToolStripMenuItem
+            // 
+            this.newToolStripMenuItem.Name = "newToolStripMenuItem";
+            this.newToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.N)));
+            this.newToolStripMenuItem.Size = new System.Drawing.Size(235, 22);
+            this.newToolStripMenuItem.Text = "New";
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(232, 6);
+            // 
+            // exportChartToolStripMenuItem
+            // 
+            this.exportChartToolStripMenuItem.Name = "exportChartToolStripMenuItem";
+            this.exportChartToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Alt) 
+            | System.Windows.Forms.Keys.C)));
+            this.exportChartToolStripMenuItem.Size = new System.Drawing.Size(235, 22);
+            this.exportChartToolStripMenuItem.Text = "Export Chart";
+            // 
+            // exportValueTableToolStripMenuItem
+            // 
+            this.exportValueTableToolStripMenuItem.Name = "exportValueTableToolStripMenuItem";
+            this.exportValueTableToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Alt) 
+            | System.Windows.Forms.Keys.T)));
+            this.exportValueTableToolStripMenuItem.Size = new System.Drawing.Size(235, 22);
+            this.exportValueTableToolStripMenuItem.Text = "Export Value Table";
+            // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(232, 6);
+            // 
+            // exitToolStripMenuItem
+            // 
+            this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
+            this.exitToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.F4)));
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(235, 22);
+            this.exitToolStripMenuItem.Text = "Exit";
+            this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
+            // 
+            // editToolStripMenuItem
+            // 
+            this.editToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.SamplingRate,
+            this.Port,
+            this.toolStripSeparator3,
+            this.actionComboBox});
+            this.editToolStripMenuItem.Name = "editToolStripMenuItem";
+            this.editToolStripMenuItem.Size = new System.Drawing.Size(39, 20);
+            this.editToolStripMenuItem.Text = "Edit";
+            // 
+            // SamplingRate
+            // 
+            this.SamplingRate.Name = "SamplingRate";
+            this.SamplingRate.Size = new System.Drawing.Size(100, 23);
+            this.SamplingRate.Text = "1000";
+            this.SamplingRate.ToolTipText = "Sampling Rate in milliseconds";
+            this.SamplingRate.Validating += new System.ComponentModel.CancelEventHandler(this.SamplingRate_Validating);
+            // 
+            // Port
+            // 
+            this.Port.Name = "Port";
+            this.Port.Size = new System.Drawing.Size(100, 23);
+            this.Port.Text = "COM1";
+            this.Port.ToolTipText = "Arduino Port";
+            // 
+            // toolStripSeparator3
+            // 
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(178, 6);
+            // 
+            // actionComboBox
+            // 
+            this.actionComboBox.Items.AddRange(new object[] {
+            "Go Up",
+            "Go Down",
+            "Measure"});
+            this.actionComboBox.Name = "actionComboBox";
+            this.actionComboBox.Size = new System.Drawing.Size(121, 23);
+            this.actionComboBox.Text = "Action";
+            this.actionComboBox.SelectedIndexChanged += new System.EventHandler(this.actionComboBox_SelectedIndexChanged);
             // 
             // MultidisciplinairProject
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(735, 617);
+            this.ClientSize = new System.Drawing.Size(740, 564);
             this.Controls.Add(this.mainChart);
-            this.Controls.Add(this.textBox1);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.autoStop);
             this.Controls.Add(this.Stop);
             this.Controls.Add(this.Start);
-            this.MaximumSize = new System.Drawing.Size(751, 656);
-            this.MinimumSize = new System.Drawing.Size(751, 656);
+            this.Controls.Add(this.menuStrip1);
+            this.MainMenuStrip = this.menuStrip1;
             this.Name = "MultidisciplinairProject";
             this.Text = "Multidisciplinair Project - Trekbank";
             ((System.ComponentModel.ISupportInitialize)(this.mainChart)).EndInit();
+            this.menuStrip1.ResumeLayout(false);
+            this.menuStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -129,8 +242,20 @@
         private System.Windows.Forms.Button Stop;
         private System.Windows.Forms.CheckBox autoStop;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.DataVisualization.Charting.Chart mainChart;
+        private System.Windows.Forms.MenuStrip menuStrip1;
+        private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem newToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripMenuItem exportChartToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem exportValueTableToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
+        private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem editToolStripMenuItem;
+        private System.Windows.Forms.ToolStripTextBox SamplingRate;
+        private System.Windows.Forms.ToolStripTextBox Port;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
+        private System.Windows.Forms.ToolStripComboBox actionComboBox;
     }
 }
 

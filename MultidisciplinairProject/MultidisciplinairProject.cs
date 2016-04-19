@@ -15,7 +15,6 @@ namespace MultidisciplinairProject {
         Timer t;
 
         public MultidisciplinairProject() {
-            arduino = new Arduino("COM1");
             t = new Timer();
 
             InitializeComponent();
@@ -27,32 +26,45 @@ namespace MultidisciplinairProject {
         }
 
         private void Start_Click(object sender, EventArgs e) {
-            if(Regex.IsMatch(textBox1.Text, "[^0-9]")) {
-                MessageBox.Show("Only enter numbers as Sampling Rate!", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
+            arduino = new Arduino(Port.Text);
+
             if(!arduino.IsOpen) {
                 arduino.OpenPort();
             }
 
-            int samplingRate = Convert.ToInt32(textBox1.Text);
-            if(samplingRate < 1) {
-                MessageBox.Show("Sampling rate must be higher then 0!", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
+            switch(actionComboBox.SelectedText) {
+                case "Go Up":
+                    actionComboBoxGoUp_START();
+                    break;
+                case "Go Down":
+                    actionComboBoxGoDown_START();
+                    break;
+                case "Measure":
+                    actionComboBoxMeasure_START();
+                    break;
+                default:
+                    MessageBox.Show("Error, undefined action has been selected", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    break;
             }
-
-            t.Interval = samplingRate;
-            try {
-                arduino.ArduinoRead("11111111");
-            } catch {
-                MessageBox.Show("Couldn't send start signal to Arduino!", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-
-            t.Tick += new EventHandler(t_Tick);
         }
 
         private void Stop_Click(object sender, EventArgs e) {
+            if(arduino.IsOpen) {
+                switch(actionComboBox.SelectedText) {
+                    case "Go Up":
+                        actionComboBoxGoUp_STOP();
+                        break;
+                    case "Go Down":
+                        actionComboBoxGoDown_STOP();
+                        break;
+                    case "Measure":
+                        actionComboBoxMeasure_STOP();
+                        break;
+                    default:
+                        MessageBox.Show("Error, undefined action has been selected", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        break;
+                }
+            }
 
         }
 
@@ -60,14 +72,69 @@ namespace MultidisciplinairProject {
             Stop.Enabled = !autoStop.Checked;
         }
 
-        private void textBox1_Validating(object sender, CancelEventArgs e) {
-            if(Regex.IsMatch(textBox1.Text, "[^0-9]")) {
+        private void t_TickMeasure(object sender, EventArgs e) {
+
+        }
+
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e) {
+            Dispose(true);
+        }
+
+        private void SamplingRate_Validating(object sender, CancelEventArgs e) {
+            if(Regex.IsMatch(SamplingRate.Text, "[^0-9]")) {
                 MessageBox.Show("Only enter numbers!", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 e.Cancel = true;
             }
         }
 
-        private void t_Tick(object sender, EventArgs e) {
+        private void actionComboBox_SelectedIndexChanged(object sender, EventArgs e) {
+            switch(actionComboBox.SelectedIndex) {
+                case 0:
+                    autoStop.Checked = false;
+                    autoStop.Enabled = false;
+                    break;
+                case 1:
+                    autoStop.Checked = false;
+                    autoStop.Enabled = false;
+                    break;
+                case 2:
+                    autoStop.Enabled = true;
+                    break;
+                default:
+                    MessageBox.Show("Unknown action selected", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    break;
+            }
+        }
+        private void actionComboBoxGoUp_START() {
+
+        }
+        private void actionComboBoxGoDown_START() {
+
+        }
+        private void actionComboBoxMeasure_START() {
+            int samplingRate = Convert.ToInt32(SamplingRate.Text);
+            if(samplingRate < 1) {
+                MessageBox.Show("Sampling rate must be higher then 0!", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            t.Interval = samplingRate;
+            try {
+                arduino.ArduinoRead("12");
+            } catch {
+                MessageBox.Show("Couldn't send start signal to Arduino!", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            t.Tick += new EventHandler(t_TickMeasure);
+        }
+
+        private void actionComboBoxGoDown_STOP() {
+
+        }
+        private void actionComboBoxGoUp_STOP() {
+
+        }
+        private void actionComboBoxMeasure_STOP() {
 
         }
     }
