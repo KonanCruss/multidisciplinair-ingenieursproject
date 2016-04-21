@@ -11,10 +11,11 @@ using System.Windows.Forms;
 
 namespace MultidisciplinairProject {
     public partial class MultidisciplinairProject : Form {
-        Arduino arduino;
-        Timer t;
+        Arduino arduino;                                    // Arduino which is being used
+        Timer t;                                            // Timer to get results every tick (can be configured from the GUI)
+        string _action;                                     // Ocupied action
         
-        // Test
+        // Constructor:
         public MultidisciplinairProject() {
             t = new Timer();
 
@@ -22,72 +23,25 @@ namespace MultidisciplinairProject {
             Init();
         }
 
+        // User initializing of stuff
         public void Init() {
             mainChart.ChartAreas.Add("mainChart");
         }
 
-        private void Start_Click(object sender, EventArgs e) {
-            arduino = new Arduino(Port.Text);
-
-            if(!arduino.IsOpen) {
-                arduino.OpenPort();
-            }
-
-            switch(actionComboBox.SelectedText) {
-                case "Go Up":
-                    actionComboBoxGoUp_START();
-                    break;
-                case "Go Down":
-                    actionComboBoxGoDown_START();
-                    break;
-                case "Measure":
-                    actionComboBoxMeasure_START();
-                    break;
-                default:
-                    MessageBox.Show("Error, undefined action has been selected", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    break;
-            }
-        }
-
-        private void Stop_Click(object sender, EventArgs e) {
-            if(arduino.IsOpen) {
-                switch(actionComboBox.SelectedText) {
-                    case "Go Up":
-                        actionComboBoxGoUp_STOP();
-                        break;
-                    case "Go Down":
-                        actionComboBoxGoDown_STOP();
-                        break;
-                    case "Measure":
-                        actionComboBoxMeasure_STOP();
-                        break;
-                    default:
-                        MessageBox.Show("Error, undefined action has been selected", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        break;
-                }
-            }
-
-        }
-
-        private void autoStop_CheckedChanged(object sender, EventArgs e) {
-            Stop.Enabled = !autoStop.Checked;
-        }
-
-        private void t_TickMeasure(object sender, EventArgs e) {
-
-        }
-
+        // Exit
         private void exitToolStripMenuItem_Click(object sender, EventArgs e) {
             Dispose(true);
         }
 
+        // Control that there are only numbers in the samplingrate textbox
         private void SamplingRate_Validating(object sender, CancelEventArgs e) {
             if(Regex.IsMatch(SamplingRate.Text, "[^0-9]")) {
                 MessageBox.Show("Only enter numbers!", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 e.Cancel = true;
             }
         }
-
+        
+        // GUI control foreach available action
         private void actionComboBox_SelectedIndexChanged(object sender, EventArgs e) {
             switch(actionComboBox.SelectedIndex) {
                 case 0:
@@ -106,12 +60,58 @@ namespace MultidisciplinairProject {
                     break;
             }
         }
+
+        // Clicking on the start button
+        private void Start_Click(object sender, EventArgs e) {
+            arduino = new Arduino(Port.Text);
+            _action = actionComboBox.SelectedText;
+
+            if(!arduino.IsOpen) {
+                arduino.OpenPort();
+            }
+
+            switch(_action) {
+                case "Go Up":
+                    actionComboBoxGoUp_START();
+                    break;
+                case "Go Down":
+                    actionComboBoxGoDown_START();
+                    break;
+                case "Measure":
+                    actionComboBoxMeasure_START();
+                    break;
+                default:
+                    MessageBox.Show("Error, undefined action has been selected!", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    break;
+            }
+        }
+
+        // Clicking on the stop button
+        private void Stop_Click(object sender, EventArgs e) {
+            if(arduino.IsOpen)
+                arduino.ClosePort();
+            if(t.Enabled) 
+                t.Stop();
+        }
+
+        private void autoStop_CheckedChanged(object sender, EventArgs e) {
+            Stop.Enabled = !autoStop.Checked;
+        }
+
+        // Tick event when measuring
+        private void t_TickMeasure(object sender, EventArgs e) {
+
+        }
+
+        // Go Up Action when clicking on start
         private void actionComboBoxGoUp_START() {
 
         }
+        // Go Down Action when clicking on start
         private void actionComboBoxGoDown_START() {
 
         }
+        // Measure Action when clicking on start
         private void actionComboBoxMeasure_START() {
             int samplingRate = Convert.ToInt32(SamplingRate.Text);
             if(samplingRate < 1) {
@@ -127,16 +127,7 @@ namespace MultidisciplinairProject {
             }
 
             t.Tick += new EventHandler(t_TickMeasure);
-        }
-
-        private void actionComboBoxGoDown_STOP() {
-
-        }
-        private void actionComboBoxGoUp_STOP() {
-
-        }
-        private void actionComboBoxMeasure_STOP() {
-
+            t.Start();
         }
     }
 }
