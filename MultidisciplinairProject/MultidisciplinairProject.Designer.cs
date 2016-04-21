@@ -39,7 +39,7 @@
             this.Start = new System.Windows.Forms.Button();
             this.Stop = new System.Windows.Forms.Button();
             this.autoStop = new System.Windows.Forms.CheckBox();
-            this.label1 = new System.Windows.Forms.Label();
+            this.TimeElapsed = new System.Windows.Forms.Label();
             this.mainChart = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -89,14 +89,14 @@
             this.autoStop.UseVisualStyleBackColor = true;
             this.autoStop.CheckedChanged += new System.EventHandler(this.autoStop_CheckedChanged);
             // 
-            // label1
+            // TimeElapsed
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(297, 32);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(70, 13);
-            this.label1.TabIndex = 3;
-            this.label1.Text = "00:00:00.000";
+            this.TimeElapsed.AutoSize = true;
+            this.TimeElapsed.Location = new System.Drawing.Point(297, 32);
+            this.TimeElapsed.Name = "TimeElapsed";
+            this.TimeElapsed.Size = new System.Drawing.Size(70, 13);
+            this.TimeElapsed.TabIndex = 3;
+            this.TimeElapsed.Text = "00:00:00.000";
             // 
             // mainChart
             // 
@@ -220,7 +220,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(740, 564);
             this.Controls.Add(this.mainChart);
-            this.Controls.Add(this.label1);
+            this.Controls.Add(this.TimeElapsed);
             this.Controls.Add(this.autoStop);
             this.Controls.Add(this.Stop);
             this.Controls.Add(this.Start);
@@ -241,7 +241,7 @@
         private System.Windows.Forms.Button Start;
         private System.Windows.Forms.Button Stop;
         private System.Windows.Forms.CheckBox autoStop;
-        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label TimeElapsed;
         private System.Windows.Forms.DataVisualization.Charting.Chart mainChart;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
