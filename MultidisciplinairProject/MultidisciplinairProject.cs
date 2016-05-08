@@ -14,7 +14,7 @@ namespace MultidisciplinairProject {
     public partial class MultidisciplinairProject : Form {
         Arduino arduino;                                    // Arduino which is being used
         Timer t;                                            // Timer to get results every tick (can be configured from the GUI)
-        string _action;                                     // Ocupied action
+        int _action;                                        // Ocupied action
 
         Series measureSerie;                                // Serie which contains the data of the measurement
         int elapsedTime = 0;                                // Time of the measurement
@@ -69,20 +69,20 @@ namespace MultidisciplinairProject {
         // Clicking on the start button
         private void Start_Click(object sender, EventArgs e) {
             arduino = new Arduino(Port.Text);
-            _action = actionComboBox.SelectedText;
+            _action = actionComboBox.SelectedIndex;
 
             if(!arduino.IsOpen) {
                 arduino.OpenPort();
             }
 
             switch(_action) {
-                case "Go Up":
+                case 0:
                     actionComboBoxGoUp_START();
                     break;
-                case "Go Down":
+                case 1:
                     actionComboBoxGoDown_START();
                     break;
-                case "Measure":
+                case 2:
                     actionComboBoxMeasure_START();
                     break;
                 default:
@@ -93,8 +93,10 @@ namespace MultidisciplinairProject {
 
         // Clicking on the stop button
         private void Stop_Click(object sender, EventArgs e) {
-            if(arduino.IsOpen)
+            if(arduino.IsOpen) {
+                arduino.ArduinoRead("0");
                 arduino.ClosePort();
+            }
             if(t.Enabled) 
                 t.Stop();
         }
@@ -105,11 +107,21 @@ namespace MultidisciplinairProject {
 
         // Go Up Action when clicking on start
         private void actionComboBoxGoUp_START() {
-
+            try {
+                arduino.ArduinoRead("2");
+            }  catch {
+                MessageBox.Show("Couldn't send start signal to Arduino!", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
         }
         // Go Down Action when clicking on start
         private void actionComboBoxGoDown_START() {
-
+            try {
+                arduino.ArduinoRead("3");
+            } catch {
+                MessageBox.Show("Couldn't send start signal to Arduino!", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
         }
         // Measure Action when clicking on start
         private void actionComboBoxMeasure_START() {
@@ -121,11 +133,13 @@ namespace MultidisciplinairProject {
                 return;
             }
             try {
-                arduino.ArduinoRead("12");
+                arduino.ArduinoRead("1");
             } catch {
                 MessageBox.Show("Couldn't send start signal to Arduino!", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
+
+            measureSerie = null;
 
             // Measurement storage:
             measureSerie = new Series("Tensile Test");
@@ -145,7 +159,7 @@ namespace MultidisciplinairProject {
         // Tick event when measuring
         private void t_TickMeasure(object sender, EventArgs e) {
             // Reading the measurement
-            int measurement = Convert.ToInt32(arduino.ReadArduino());
+            double measurement = convertArduinoData(Convert.ToInt32(arduino.ReadArduino()));
             elapsedTime += t.Interval;
 
             // Adding the measurement
@@ -204,6 +218,10 @@ namespace MultidisciplinairProject {
                 ;
             }
             TimeElapsed.Text = h + ":" + min + ":" + s + "." + ms;
+        }
+
+        private double convertArduinoData(int arduinoReading) {
+            return 0.000255272672224251 * arduinoReading - 0.0912923946701554;
         }
     }
 }
