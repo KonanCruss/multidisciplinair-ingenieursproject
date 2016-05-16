@@ -31,19 +31,13 @@ namespace MultidisciplinairProject {
         // User initializing of stuff
         public void Init() {
             mainChart.ChartAreas.Add("mainChart");
+            mainChart.ChartAreas[0].AxisX.Title = "Time (s)";
+            mainChart.ChartAreas[0].AxisY.Title = "Force (N)";
         }
 
         // Exit
         private void exitToolStripMenuItem_Click(object sender, EventArgs e) {
             Dispose(true);
-        }
-
-        // Control that there are only numbers in the samplingrate textbox
-        private void SamplingRate_Validating(object sender, CancelEventArgs e) {
-            if(Regex.IsMatch(SamplingRate.Text, "[^0-9]")) {
-                MessageBox.Show("Only enter numbers!", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                e.Cancel = true;
-            }
         }
         
         // GUI control foreach available action
@@ -68,11 +62,18 @@ namespace MultidisciplinairProject {
 
         // Clicking on the start button
         private void Start_Click(object sender, EventArgs e) {
+            if(t.Enabled)
+                return;
             arduino = new Arduino(Port.Text);
             _action = actionComboBox.SelectedIndex;
 
             if(!arduino.IsOpen) {
-                arduino.OpenPort();
+                try {
+                    arduino.OpenPort();
+                } catch {
+                    MessageBox.Show("Unable to open the Arduino: Check your port!", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
             }
 
             switch(_action) {
@@ -87,8 +88,9 @@ namespace MultidisciplinairProject {
                     break;
                 default:
                     MessageBox.Show("Error, undefined action has been selected!", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    break;
+                    return;
             }
+            Start.Enabled = false;
         }
 
         // Clicking on the stop button
@@ -99,6 +101,7 @@ namespace MultidisciplinairProject {
             }
             if(t.Enabled) 
                 t.Stop();
+            Start.Enabled = true;
         }
 
         private void autoStop_CheckedChanged(object sender, EventArgs e) {
@@ -125,13 +128,16 @@ namespace MultidisciplinairProject {
         }
         // Measure Action when clicking on start
         private void actionComboBoxMeasure_START() {
-            int samplingRate = Convert.ToInt32(SamplingRate.Text);
-
-            // Error handling:
-            if(samplingRate < 1) {
-                MessageBox.Show("Sampling rate must be higher then 0!", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
+            mainChart.Series.Remove(measureSerie);
+            if(!mainChart.Series.Contains(measureSerie)) {
+                measureSerie = null;
+                measureSerie = new Series("Tensile Test");
+                measureSerie.ChartType = SeriesChartType.Point;
+                mainChart.Series.Add(measureSerie);
+                measureSerie.YValuesPerPoint = 1;           // Making sure only 1value can be assigned to 1 X value
             }
+            
+            // Error handling:
             try {
                 arduino.ArduinoRead("1");
             } catch {
@@ -139,19 +145,9 @@ namespace MultidisciplinairProject {
                 return;
             }
 
-            measureSerie = null;
-
-            // Measurement storage:
-            measureSerie = new Series("Tensile Test");
-
-            mainChart.Series.Add(measureSerie);
-            measureSerie.AxisLabel = "Force (N)";
-            measureSerie.YValuesPerPoint = 1;           // Making sure only 1value can be assigned to 1 X value
-            measureSerie.Points.AddXY(0.0, 0.0);
-
             // Timer setup:
             elapsedTime = 0;
-            t.Interval = samplingRate;
+            t.Interval = 100;
             t.Tick += new EventHandler(t_TickMeasure);
             t.Start();
         }
@@ -159,11 +155,12 @@ namespace MultidisciplinairProject {
         // Tick event when measuring
         private void t_TickMeasure(object sender, EventArgs e) {
             // Reading the measurement
-            double measurement = convertArduinoData(Convert.ToInt32(arduino.ReadArduino()));
+            //double measurement = convertArduinoData(Convert.ToInt32(arduino.ReadArduino()));
+            double measurement = Convert.ToDouble(arduino.ReadArduino());                           // Testing purposes
             elapsedTime += t.Interval;
 
             // Adding the measurement
-            measureSerie.Points.AddXY(elapsedTime, measurement);
+            measureSerie.Points.AddXY(((double) elapsedTime)/1000, measurement);
             measurements = measureSerie.Points.ToList();
 
             // Updating the time label
@@ -222,6 +219,17 @@ namespace MultidisciplinairProject {
 
         private double convertArduinoData(int arduinoReading) {
             return 0.000255272672224251 * arduinoReading - 0.0912923946701554;
+        }
+
+        private void exportChartToolStripMenuItem_Click(object sender, EventArgs e) {
+            mainChart.SaveImage("Chart_Measurement.jpeg", ChartImageFormat.Jpeg);
+            MessageBox.Show("Chart saved as \"Chart_Measurement.jpeg\"", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void newToolStripMenuItem_Click(object sender, EventArgs e) {
+            if(!t.Enabled) {
+                mainChart.Series.Remove(measureSerie);
+            }
         }
     }
 }

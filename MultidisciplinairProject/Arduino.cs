@@ -22,22 +22,17 @@ namespace MultidisciplinairProject {
         }
 
         /// <summary>
-        /// Constructor: opens the serialport, on baudrate 19200
+        /// Constructor: opens the serialport, on baudrate 9600
         /// </summary> 
         public Arduino (string port) {
-            arduino = new SerialPort(port, 19200, Parity.None, 8, StopBits.One);
+            arduino = new SerialPort(port, 9600, Parity.None, 8, StopBits.One);
         }
         
         /// <summary>
         /// Opens the Arduino port
         /// </summary>
         public void OpenPort() {
-            try {
-                arduino.Open();
-                Console.WriteLine("Check");
-            } catch {
-                Console.WriteLine("Unable to find Arduino! Check the port.");
-            }
+            arduino.Open();
         }
         /// <summary>
         /// Closes the Arduino port
